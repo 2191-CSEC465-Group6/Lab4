@@ -1,0 +1,38 @@
+name: Querying on Windows
+host: windows
+vars:
+    ansible_port: 5986
+    ansible_connection: winrm
+    default WinRM self-signed certificates:
+    ansible_winrm_server_cert_validation: ignore
+tasks:
+
+    name: Hostname and Domain
+    win_command: echo Hostname & hostname & wmic computersystem get domain
+	
+    name: OS and OS Patch Level
+    win_command: systeminfo | findstr Build
+	
+    name: IP
+    win_command: ipconfig | findstr /i "IPv4"
+	
+    name: List of local users
+    win_command: net users
+    
+    name: Installed Server Components ****
+    win_command: 
+    
+    name: Installed Application Software
+    win_command: wmic product get name,version
+    
+    name: Software that runs on boot
+    win_command: wmic startup get caption,command
+    
+    name: Recent User logins
+    win_command: quser
+    
+    name: Running Processes
+    win_command: gwmi win32_process | select ProcessName, ProcessID, ParentProcessID, UserID, path | format-list
+    
+    name: Suspicious Outbound Connections
+    win_command: netstat -an | findstr /V ":80" | findstr /V ":443" | findstr ESTABLISHED
