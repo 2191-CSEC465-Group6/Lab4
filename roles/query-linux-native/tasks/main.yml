@@ -1,19 +1,35 @@
 ---
+- name: Get the hostname
+  command: hostname --fqdn
+  register: hostname_fqdn
+
 - name: Print the hostname
   debug:
-    var: ansible_facts.ansible_fqdn
+    var: hostname_fqdn
+
+- name: Get the OS
+  shell: source /etc/os-release && echo $NAME
+  register: os_distribution
 
 - name: Print the OS
   debug:
-    var: ansible_facts.ansible_distribution
+    var: os_distribution
+
+- name: Get the OS version
+  shell: source /etc/os-release && echo $VERSION_ID
+  register: os_version
 
 - name: Print the OS version
   debug:
-    var: ansible_facts.ansible_distribution_version
+    var: os_version
+
+- name: Get the IPv4 address
+  command: ip -f inet addr show eth0 | grep -Po 'inet \K[\d.]+'
+  register: ipv4_address
 
 - name: Print the IPv4 address
   debug:
-    var: ansible_facts.ansible_default_ipv4.address
+    var: ipv4_address
 
 - name: Get the local users in /etc/passwd
   command: cat /etc/passwd
@@ -24,12 +40,12 @@
     var: passwd
 
 - name: Gather the apt package facts
-  package_facts:
-    manager: apt
+  command: apt list --installed
+  register: packages
 
 - name: Print the apt package facts
   debug:
-    var: ansible_facts.packages
+    var: packages
 
 - name: Get the software that is run at startup
   command: ls /etc/init.d
