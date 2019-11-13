@@ -1,2 +1,80 @@
 ---
-# tasks file for query-linux-osquery
+- name: Get the hostname
+  command: osqueryi "SELECT hostname FROM system_info;"
+  register: hostname_fqdn
+
+- name: Print the hostname
+  debug:
+    var: hostname_fqdn.stdout_lines
+
+- name: Get the OS
+  command: osqueryi "SELECT name FROM os_version;"
+  register: os_distribution
+
+- name: Print the OS
+  debug:
+    var: os_distribution.stdout_lines
+
+- name: Get the OS version
+  command: osqueryi "SELECT version FROM os_version;"
+  register: os_version
+
+- name: Print the OS version
+  debug:
+    var: os_version.stdout_lines
+
+- name: Get the IPv4 address
+  command: osqueryi 'SELECT address,friendly_name FROM interface_addresses WHERE friendly_name LIKE "%Wi-Fi%" OR friendly_name LIKE "Ethernet%";'
+  register: ipv4_address
+
+- name: Print the IPv4 address
+  debug:
+    var: ipv4_address.stdout_lines
+
+- name: Get the local users
+  command: osqueryi "SELECT username FROM users;"
+  register: local_users
+
+- name: Print the local users
+  debug:
+    var: local_users.stdout_lines
+
+- name: Get the installed packages
+  command: osqueryi "SELECT * FROM deb_packages;"
+  register: packages
+
+- name: Print the installed packages
+  debug:
+    var: packages.stdout_lines
+
+# - name: Get the startup software
+#   command: osqueryi ""
+#   register: startup_packages
+
+# - name: Print the startup packages
+#   debug:
+#     var: startup_packages.stdout_lines
+
+- name: Get systemd services
+  command: osqueryi "SELECT * FROM etc_services;"
+  register: systemd_services
+
+- name: Print the systemd services
+  debug:
+    var: systemd_services.stdout_lines
+
+- name: Get user login history
+  command: osqueryi "SELECT * FROM logon_sessions;"
+  register: login_history
+
+- name: Print the login history
+  debug:
+    var: login_history.stdout_lines
+
+- name: Get the running processes
+  command: osqueryi 'SELECT pid,name,path,cmdline FROM processes WHERE state="STILL_ACTIVE";'
+  register: running_processes
+
+- name: Print the running processes
+  debug:
+    var: running_processes.stdout_lines
